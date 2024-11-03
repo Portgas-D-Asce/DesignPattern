@@ -8,7 +8,10 @@ class Singleton {
 public:
     static T& get() {
         std::once_flag flag;
-        std::call_once(flag, [&]() { _instance = std::unique_ptr<T>(new T()); });
+        std::call_once(flag, [&]() {
+            _instance = std::unique_ptr<T>(new T());
+            _instance->init();
+        });
         return *_instance;
     }
 
@@ -41,17 +44,18 @@ private:
     Instance() {
         // load messages from config and init single instance
     }
+    void init() {
+
+    }
     ~Instance() = default;
 };
 
-using SingletonInstance = Singleton<Instance>;
-
 int main() {
-    Instance& ins = SingletonInstance::get();
+    Instance& ins = Singleton<Instance>::get();
 
     ins.func();
 
-    SingletonInstance::destroy();
+    Singleton<Instance>::destroy();
 
     return 0;
 }
